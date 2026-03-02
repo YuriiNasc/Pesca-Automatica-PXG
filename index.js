@@ -19,8 +19,8 @@ function focusWindow(title) {
 function keyTap(key) {
     try {
         const title = "PokeXGames";
-        // Script PowerShell que foca na janela, espera um pouco e envia a tecla
-        const psScript = `$wshell = New-Object -ComObject WScript.Shell; if ($wshell.AppActivate('${title}')) { Start-Sleep -m 150; [System.Windows.Forms.SendKeys]::SendWait('${key}') }`;
+        // Script PowerShell que carrega o assembly, foca na janela e envia a tecla
+        const psScript = `Add-Type -AssemblyName System.Windows.Forms; $wshell = New-Object -ComObject WScript.Shell; if ($wshell.AppActivate('${title}')) { Start-Sleep -m 150; [System.Windows.Forms.SendKeys]::SendWait('${key}') }`;
         const command = `powershell -Command "${psScript}"`;
         execSync(command);
     } catch (err) {
@@ -118,9 +118,9 @@ async function startBot() {
     console.log("Pressione Ctrl+C para parar.");
 
     while (true) {
-        console.log("Jogando a vara (tecla Shift+D)...");
-        // Simula casting da vara (Shift+D = +d)
-        keyTap("+d");
+        console.log("Jogando a vara (tecla Shift+Z)...");
+        // Simula casting da vara (Shift+Z = +z)
+        keyTap("+z");
         await new Promise(r => setTimeout(r, 2000)); // Espera a vara cair na água
 
         let bubblesFound = false;
@@ -131,7 +131,7 @@ async function startBot() {
             const bubbles = await findImageOnScreen(bolhasImgPath);
             if (bubbles) {
                 console.log("Bolhas detectadas! Puxando a vara...");
-                keyTap("+d"); // Puxa a vara
+                keyTap("+z"); // Puxa a vara
                 bubblesFound = true;
                 break;
             }
