@@ -5,9 +5,20 @@ const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-// Função para simular pressionamento de tecla via PowerShell (sem robotojs)
+// Função para focar na janela do jogo
+function focusWindow(title) {
+    try {
+        const command = `powershell -Command "(New-Object -ComObject WScript.Shell).AppActivate('${title}')"`;
+        execSync(command);
+    } catch (err) {
+        // Silencioso se não conseguir focar
+    }
+}
+
+// Função para simular pressionamento de tecla via PowerShell
 function keyTap(key) {
     try {
+        focusWindow("PokeXGames");
         const command = `powershell -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('${key}')"`;
         execSync(command);
     } catch (err) {
@@ -15,11 +26,12 @@ function keyTap(key) {
     }
 }
 
-// Função para verificar se o processo do jogo está rodando
-function isProcessRunning(processName) {
+// Função para verificar se o jogo está aberto (pelo título da janela ou processo)
+function isGameOpen(title) {
     try {
-        const stdout = execSync(`tasklist /FI "IMAGENAME eq ${processName}" /NH`).toString();
-        return stdout.toLowerCase().includes(processName.toLowerCase());
+        const command = `powershell -Command "Get-Process | Where-Object { $_.MainWindowTitle -eq '${title}' }"`;
+        const stdout = execSync(command).toString();
+        return stdout.length > 0;
     } catch (err) {
         return false;
     }
@@ -137,10 +149,10 @@ async function startBot() {
 }
 
 function main() {
-    console.log("Verificando se o jogo (pxgme.exe) está aberto...");
-    if (!isProcessRunning('pxgme.exe')) {
-        console.warn("AVISO: O processo 'pxgme.exe' não foi detectado.");
-        console.warn("Certifique-se de que o jogo está aberto.");
+    console.log("Verificando se o jogo (PokeXGames) está aberto...");
+    if (!isGameOpen('PokeXGames')) {
+        console.warn("AVISO: A janela 'PokeXGames' não foi detectada.");
+        console.warn("Certifique-se de que o jogo está aberto e visível.");
         const continuar = readline.question("Deseja continuar mesmo assim? (S/N): ");
         if (continuar.toUpperCase() !== 'S') {
             process.exit();
