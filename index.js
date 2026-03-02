@@ -18,8 +18,10 @@ function focusWindow(title) {
 // Função para simular pressionamento de tecla via PowerShell
 function keyTap(key) {
     try {
-        focusWindow("PokeXGames");
-        const command = `powershell -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('${key}')"`;
+        const title = "PokeXGames";
+        // Script PowerShell que foca na janela, espera um pouco e envia a tecla
+        const psScript = `$wshell = New-Object -ComObject WScript.Shell; if ($wshell.AppActivate('${title}')) { Start-Sleep -m 150; [System.Windows.Forms.SendKeys]::SendWait('${key}') }`;
+        const command = `powershell -Command "${psScript}"`;
         execSync(command);
     } catch (err) {
         console.error(`Erro ao pressionar tecla ${key}:`, err.message);
@@ -37,13 +39,13 @@ function isGameOpen(title) {
     }
 }
 
-// Função para executar magias (teclas 1 a 8)
+// Função para executar magias (teclas 8 a 1)
 async function executeSpells() {
-    console.log("Executando magias (teclas 1-8)...");
-    const spells = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    console.log("Executando magias (teclas 8-1)...");
+    const spells = ['8', '7', '6', '5', '4', '3', '2', '1'];
     for (const spell of spells) {
         keyTap(spell);
-        await new Promise(r => setTimeout(r, 300)); // Pequeno intervalo entre magias
+        await new Promise(r => setTimeout(r, 200)); // Pequeno intervalo entre magias
     }
 }
 
@@ -116,9 +118,9 @@ async function startBot() {
     console.log("Pressione Ctrl+C para parar.");
 
     while (true) {
-        console.log("Jogando a vara (tecla CTRL+Z)...");
-        // Simula casting da vara (ajuste o atalho se necessário)
-        keyTap("^z");
+        console.log("Jogando a vara (tecla Shift+D)...");
+        // Simula casting da vara (Shift+D = +d)
+        keyTap("+d");
         await new Promise(r => setTimeout(r, 2000)); // Espera a vara cair na água
 
         let bubblesFound = false;
@@ -129,7 +131,7 @@ async function startBot() {
             const bubbles = await findImageOnScreen(bolhasImgPath);
             if (bubbles) {
                 console.log("Bolhas detectadas! Puxando a vara...");
-                keyTap("^z"); // Puxa a vara
+                keyTap("+d"); // Puxa a vara
                 bubblesFound = true;
                 break;
             }
