@@ -8,12 +8,30 @@ const { execSync } = require('child_process');
 // Função para simular pressionamento de tecla via PowerShell (sem robotojs)
 function keyTap(key) {
     try {
-        // Envolve a tecla em chaves para o SendKeys se necessário, 
-        // ou envia diretamente se for um número/letra simples.
         const command = `powershell -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('${key}')"`;
         execSync(command);
     } catch (err) {
         console.error(`Erro ao pressionar tecla ${key}:`, err.message);
+    }
+}
+
+// Função para verificar se o processo do jogo está rodando
+function isProcessRunning(processName) {
+    try {
+        const stdout = execSync(`tasklist /FI "IMAGENAME eq ${processName}" /NH`).toString();
+        return stdout.toLowerCase().includes(processName.toLowerCase());
+    } catch (err) {
+        return false;
+    }
+}
+
+// Função para executar magias (teclas 1 a 8)
+async function executeSpells() {
+    console.log("Executando magias (teclas 1-8)...");
+    const spells = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    for (const spell of spells) {
+        keyTap(spell);
+        await new Promise(r => setTimeout(r, 300)); // Pequeno intervalo entre magias
     }
 }
 
@@ -119,6 +137,16 @@ async function startBot() {
 }
 
 function main() {
+    console.log("Verificando se o jogo (pxgme.exe) está aberto...");
+    if (!isProcessRunning('pxgme.exe')) {
+        console.warn("AVISO: O processo 'pxgme.exe' não foi detectado.");
+        console.warn("Certifique-se de que o jogo está aberto.");
+        const continuar = readline.question("Deseja continuar mesmo assim? (S/N): ");
+        if (continuar.toUpperCase() !== 'S') {
+            process.exit();
+        }
+    }
+
     const resposta = readline.question("Deseja iniciar o macro de pesca? (S/N): ");
 
     if (resposta.toUpperCase() === 'S') {
